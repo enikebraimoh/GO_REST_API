@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -53,11 +54,11 @@ func main() {
 
 	// Endpoints
 	router.HandleFunc("/", index).Methods("GET")
-	router.HandleFunc("/getFoods", getFoods).Methods("GET")
-	router.HandleFunc("/getFoods/{id}", getFoods).Methods("GET")
-	router.HandleFunc("/getFoods", createFood).Methods("POST")
-	router.HandleFunc("/getFoods/{id}", updateFood).Methods("PUT")
-	router.HandleFunc("/getFoods/{id}", deleteFood).Methods("DELETE")
+	router.HandleFunc("/getfoods", getFoods).Methods("GET")
+	router.HandleFunc("/getfoods/{id}", getFoods).Methods("GET")
+	router.HandleFunc("/getfoods", createFood).Methods("POST")
+	router.HandleFunc("/getfoods/{id}", updateFood).Methods("PUT")
+	router.HandleFunc("/getfoods/{id}", deleteFood).Methods("DELETE")
 
 	// start server
 	log.Fatal(http.ListenAndServe(":8000", router))
@@ -65,10 +66,11 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-
+	json.NewEncoder(w).Encode("Hello Welcome")
 }
 func getFoods(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("content-Type", "application/json")
+	json.NewEncoder(w).Encode(foods)
 }
 func createFood(w http.ResponseWriter, r *http.Request) {
 
