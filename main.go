@@ -56,6 +56,7 @@ func main() {
 	router.HandleFunc("/", index).Methods("GET")
 	router.HandleFunc("/getfoods", getFoods).Methods("GET")
 	router.HandleFunc("/getfoods/{id}", getFoods).Methods("GET")
+	router.HandleFunc("/getfood/{id}", getFood).Methods("GET")
 	router.HandleFunc("/getfoods", createFood).Methods("POST")
 	router.HandleFunc("/getfoods/{id}", updateFood).Methods("PUT")
 	router.HandleFunc("/getfoods/{id}", deleteFood).Methods("DELETE")
@@ -66,11 +67,22 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("Hello Welcome")
+	json.NewEncoder(w).Encode("Hello Welcome to Enike's food endpoints.. \\getfoods - to get all food")
 }
 func getFoods(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-Type", "application/json")
 	json.NewEncoder(w).Encode(foods)
+}
+func getFood(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	w.Header().Set("content-Type", "application/json")
+	for _, item := range foods {
+		if item.Id == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(&Food{})
 }
 func createFood(w http.ResponseWriter, r *http.Request) {
 
