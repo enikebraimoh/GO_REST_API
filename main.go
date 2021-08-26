@@ -112,7 +112,7 @@ func updateFood(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&food)
 			food.Id = params["id"] // fake mock ID
 			foods = append(foods, food)
-			json.NewEncoder(w).Encode(food)
+			json.NewEncoder(w).Encode(foods)
 			return
 		}
 	}
