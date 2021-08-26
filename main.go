@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -55,8 +57,7 @@ func main() {
 	// Endpoints
 	router.HandleFunc("/", index).Methods("GET")
 	router.HandleFunc("/getfoods", getFoods).Methods("GET")
-	router.HandleFunc("/getfoods/{id}", getFoods).Methods("GET")
-	router.HandleFunc("/getfood/{id}", getFood).Methods("GET")
+	router.HandleFunc("/getfoods/{id}", getFood).Methods("GET")
 	router.HandleFunc("/getfoods", createFood).Methods("POST")
 	router.HandleFunc("/getfoods/{id}", updateFood).Methods("PUT")
 	router.HandleFunc("/getfoods/{id}", deleteFood).Methods("DELETE")
@@ -66,16 +67,21 @@ func main() {
 
 }
 
+// starting endpoint
 func index(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("Hello Welcome to Enike's food endpoints.. \\getfoods - to get all food")
 }
+
+// gets all the food from the database
 func getFoods(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-Type", "application/json")
 	json.NewEncoder(w).Encode(foods)
 }
+
+// get a particular food ffrom the database
 func getFood(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
 	w.Header().Set("content-Type", "application/json")
+	params := mux.Vars(r)
 	for _, item := range foods {
 		if item.Id == params["id"] {
 			json.NewEncoder(w).Encode(item)
@@ -84,12 +90,44 @@ func getFood(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(&Food{})
 }
+
+// to create a new book
 func createFood(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("content-Type", "application/json")
+	var food Food
+	_ = json.NewDecoder(r.Body).Decode(&food)
+	food.Id = strconv.Itoa(rand.Intn(100))
+	foods = append(foods, food)
+	json.NewEncoder(w).Encode(food)
 }
+
+// update an existing food
 func updateFood(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("content-Type", "application/json")
+	params := mux.Vars(r)
+	for index, item := range foods {
+		if item.Id == params["id"] {
+			foods = append(foods[:index], foods[index+1:]...)
+			var food Food
+			_ = json.NewDecoder(r.Body).Decode(&food)
+			food.Id = params["id"] // fake mock ID
+			foods = append(foods, food)
+			json.NewEncoder(w).Encode(food)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(foods)
 }
-func deleteFood(w http.ResponseWriter, r *http.Request) {
 
+//delete a particular book
+func deleteFood(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-Type", "application/json")
+	params := mux.Vars(r)
+	for index, item := range foods {
+		if item.Id == params["id"] {
+			foods = append(foods[:index], foods[index+1:]...)
+			break
+		}
+	}
+	json.NewEncoder(w).Encode(foods)
 }
